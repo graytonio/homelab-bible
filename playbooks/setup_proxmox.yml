@@ -25,7 +25,39 @@
       stat:
         path: /var/run/reboot-required
       register: p
-    
-    - name: Reboot Server if required
+
+    - name: Reboot Server if Required
       reboot:
       when: p.stat.exists
+
+    - name: Enable PCI Passthrough in GRUB
+      lineinfile:
+        path: /etc/default/grub
+        regexp: '^GRUB_CMDLINE_LINUX_DEFAULT='
+        line: GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on"
+      register: grub
+
+    - name: Update GRUB
+      shell: update-grub
+      when: grub.changed
+
+    - name: Enable PCI Passthrough Kernel Modules
+      lineinfile:
+        path: /etc/modules
+        line: "{{ item }}"
+        state: present
+      with_items:
+        - vfio
+        - vfio_iommu_type1
+        - vfio_pci
+        - vfio_virqfd
+      register: modules
+
+    - name: Update Kernel Modules
+      shell: update-initramfs -u -k all
+      when: modules.changed
+
+    - name: Reboot Server if Required
+      reboot:
+      when: modules.changed or grub.changed
+
