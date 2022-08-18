@@ -1,0 +1,5 @@
+[proxmox]
+192.168.50.10
+
+[proxmox:vars]
+ansible_user=root

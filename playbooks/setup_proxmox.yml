@@ -1,0 +1,31 @@
+#!/usr/bin/env ansible-playbook
+
+- name: Configure Proxmox
+  hosts: proxmox
+  tasks:
+    - name: Ensure Enterprise Repo is Removed
+      apt_repository:
+        repo: deb https://enterprise.proxmox.com/debian/pve bullseye pve-enterprise
+        state: absent
+
+    - name: Ensure No-Subscription Repo is Enabled
+      apt_repository:
+        repo: deb http://download.proxmox.com/debian/pve bullseye pve-no-subscription
+        state: present
+
+    - name: Update Package Repositories
+      apt:
+        update_cache: yes
+
+    - name: Upgrade All Packages
+      apt:
+        upgrade: yes
+
+    - name: Check if reboot is required
+      stat:
+        path: /var/run/reboot-required
+      register: p
+    
+    - name: Reboot Server if required
+      reboot:
+      when: p.stat.exists
