@@ -1,0 +1,15 @@
+- name: Update All Packages
+  apt:
+    update_cache: true
+    upgrade: true
+
+- name: Ensure QEMU Guest Agent is Installed
+  apt:
+    name: qemu-guest-agent
+    statue: present
+
+- name: Ensure QEMU Guest Agent is Enabled
+  systemd:
+    name: qemu-guest-agent
+    state: started
+    enabled: yes
