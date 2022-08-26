@@ -1,0 +1,42 @@
+- name: Check if Template VM Exists
+  shell: "qm status {{ vm_id }}"
+  ignore_errors: true
+  register: template_exists
+
+- name: Create VM Template if it Does not Exist
+  run_once: true
+  block:
+    - name: Download CloudInit Image
+      get_url:
+        url: https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
+        dest: /root/jammy-server-cloudimg-amd64.img
+    
+    - name: Create VM
+      shell: "qm create {{ vm_id }} --memory {{ default_memory }} --core {{ default_cores }} --name {{ image_name }} --net0 virtio,bridge={{ default_network }}"
+  
+    - name: Import CloudInit Image
+      shell: "qm importdisk {{ vm_id }} /root/jammy-server-cloudimg-amd64.img {{ default_storage }}"
+
+    - name: Attach New Disk to VM
+      shell: "qm set {{ vm_id }} --scsihw virtio-scsi-pci --scsi0 {{ default_storage }}:vm-{{ vm_id }}-disk-0"
+
+    - name: Attach CloudInit Drive
+      shell: "qm set {{ vm_id }} --ide2 {{ default_storage }}:cloudinit"
+
+    - name: Make CloudInit Bootable
+      shell: "qm set {{ vm_id }} --boot c --bootdisk scsi0"
+
+    - name: Add Serial Console
+      shell: "qm set {{ vm_id }} --serial0 socket --vga serial0"
+
+    - name: Configure CloudInit
+      shell: "qm set {{ vm_id }} --ciuser \"{{ default_user }}\""
+
+    - name: Convert VM to Template
+      shell: "qm template {{ vm_id }}"
+  rescue:
+    - name: Remove Malformed VM Template
+      shell: "qm destroy {{ vm_id }}"
+  when: play_hosts | map('extract', hostvars, 'template_exists') | selectattr('failed', 'defined') | list | count == 0
+  # Only execute if template vm is found on none of the proxmox hosts
+  # NOTE: Assumes you are running this on proxmox hosts all in a single cluster

@@ -1,0 +1,7 @@
+vm_id: 9000
+image_name: ubuntu-22.04-template
+default_network: vmbr0
+default_memory: 2048
+default_cores: 2
+default_storage: proxmox-shared
+default_user: ansible

@@ -2,6 +2,8 @@
 
 - name: Configure Proxmox
   hosts: proxmox
+  roles:
+    - cloudinit-template
   tasks:
     - name: Ensure Enterprise Repo is Removed
       apt_repository:
@@ -60,4 +62,3 @@
     - name: Reboot Server if Required
       reboot:
       when: modules.changed or grub.changed
-
