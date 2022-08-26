@@ -1,0 +1,22 @@
+#!/usr/bin/env ansible-playbook
+
+- name: Push Active Keys To Hosts
+  hosts: all
+  tasks:
+    - block:
+      - name: Compile Active Keys into Single File
+        run_once: true
+        local_action: shell keys/collect.sh
+      
+      - name: Push Keys Out To Hosts
+        authorized_key:
+          user: "{{ ansible_user }}"
+          state: present
+          exclusive: true
+          key: "{{ lookup('file', 'allkeys.key') }}"
+      always:
+      - name: Cleanup AllKeys Files
+        run_once: true
+        file:
+          path: allkeys.key
+          state: absent
