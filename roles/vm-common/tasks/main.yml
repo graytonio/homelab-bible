@@ -6,7 +6,7 @@
 - name: Ensure QEMU Guest Agent is Installed
   apt:
     name: qemu-guest-agent
-    statue: present
+    state: present
 
 - name: Ensure QEMU Guest Agent is Enabled
   systemd:

@@ -1,0 +1,7 @@
+#!/usr/bin/env ansible-playbook
+
+- name: Configure VM
+  hosts: "{{ targets }}"
+  become: true
+  roles:
+    - vm-common

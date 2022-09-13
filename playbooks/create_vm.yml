@@ -4,8 +4,8 @@
   hosts: proxmox
   vars:
    template_id: 9000
-   storage: proxmox-shared
-   target: kratos
+   storage: local-lvm
+   target: lakeland
    start_vm: true
   vars_prompt:
   - name: hostname
@@ -46,6 +46,12 @@
       storage: "{{ storage }}"
       target: "{{ target }}"
       start_vm: "{{ start_vm }}"
+      hostname: "{{ hostname }}"
+      ip_address: "{{ ip_address }}"
+      gateway: "{{ gateway }}"
+      disk_space: "{{ disk_space }}"
+      cpu_cores: "{{ cpu_cores }}"
+      ram: "{{ ram }}"
   roles:
   - role: cloudinit-template
     vars:
@@ -69,6 +75,7 @@
     storage: '{{ hostvars["localhost"]["storage"] }}'
     target: '{{ hostvars["localhost"]["target"] }}'
     start_vm: '{{ hostvars["localhost"]["start_vm"] }}'
+    hostname: '{{ hostvars["localhost"]["hostname"] }}'
   tasks:
   - name: Check if Provided VM/Hostname already exist
     find:
@@ -101,6 +108,11 @@
 - name: Configure VM Hardware
   vars:
     vm_id: '{{ hostvars[template_host]["vm_id"] }}'
+    gateway: '{{ hostvars["localhost"]["gateway"] }}'
+    ip_address: '{{ hostvars["localhost"]["ip_address"] }}'
+    disk_space: '{{ hostvars["localhost"]["disk_space"] }}'
+    cpu_cores: '{{ hostvars["localhost"]["cpu_cores"] }}'
+    ram: '{{ hostvars["localhost"]["ram"] }}'
   hosts: target_host
   tasks:
   - name: Allow time for vm to be fully created
@@ -145,9 +157,3 @@
   - name: Wait for VM to boot
     pause:
       seconds: 60
-
-- name: Configure VM
-  hosts: "{{ hostname }}"
-  become: true
-  roles:
-    - vm-common

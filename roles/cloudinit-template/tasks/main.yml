@@ -3,6 +3,14 @@
   ignore_errors: true
   register: template_exists
 
+- name: Debug Output
+  debug:
+    var: template_exists
+
+- name: Debug Condition
+  debug:
+    var: "{{ play_hosts | map('extract', hostvars, 'template_exists') | selectattr('failed', '==', false) | list | count }}"
+
 - name: Create VM Template if it Does not Exist
   run_once: true
   block:
@@ -37,6 +45,6 @@
   rescue:
     - name: Remove Malformed VM Template
       shell: "qm destroy {{ vm_id }}"
-  when: play_hosts | map('extract', hostvars, 'template_exists') | selectattr('failed', 'defined') | list | count == 0
+  when: play_hosts | map('extract', hostvars, 'template_exists') | selectattr('failed', '==', false) | list | count == 0
   # Only execute if template vm is found on none of the proxmox hosts
   # NOTE: Assumes you are running this on proxmox hosts all in a single cluster

@@ -1,21 +1,22 @@
 [proxmox]
-kratos
-kube-0
-kube-1
-kube-2
-notch
+#kratos
+#kube-0
+#kube-1
+#kube-2
+#notch
+lakeland ansible_host=192.168.5.10
 
 [vms]
-plextest
-pihole
-talos
-nginx
-kube-master
-backup-jobs
-kube-node-0
-kube-node-1
-kube-node-2
-test ansible_host=10.0.0.69
+#plextest
+#pihole
+#talos
+#nginx
+#kube-master
+#backup-jobs
+#kube-node-0
+#kube-node-1
+#kube-node-2
+pihole ansible_host=192.168.5.5
 
 [proxmox:vars]
 ansible_user=root

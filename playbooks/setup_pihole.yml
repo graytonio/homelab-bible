@@ -1,0 +1,30 @@
+#!/usr/bin/env ansible-playbook
+
+- name: Configure PiHole
+  hosts: "{{ targets }}"
+  become: true
+  roles:
+    - vm-common
+  vars_prompt:
+    - name: password
+      prompt: Web password
+      private: true
+  vars:
+    targets: "pihole"
+  tasks:
+    - name: Hash Password
+      shell: "echo -n {{ password }} | sha256sum | awk '{printf \"%s\",$1 }' | sha256sum | awk '{printf \"%s\",$1}'"
+      register: hashed_password_shell
+    - name: Set Hashed Password
+      set_fact:
+        hashed_password: "{{ hashed_password_shell.stdout }}"
+    - name: Make Sure PiHole Dir Exists
+      file:
+        path: /etc/pihole
+        state: directory
+    - name: Create setupVars.conf
+      template:
+        src: templates/pihole-setupVars.j2
+        dest: /etc/pihole/setupVars.conf
+    - name: Run Install Script
+      shell: curl -L https://install.pi-hole.net | bash /dev/stdin --unattended
