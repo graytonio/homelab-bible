@@ -3,7 +3,9 @@
 - name: Configure Proxmox
   hosts: proxmox
   roles:
-    - cloudinit-template
+    - role: cloudinit-template
+      vars:
+        default_storage: "local-zfs"
   tasks:
     - name: Ensure Enterprise Repo is Removed
       apt_repository:
