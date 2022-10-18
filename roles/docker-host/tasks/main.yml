@@ -1,0 +1,47 @@
+- name: Remove Old Docker Verisons
+  apt:
+    pkg:
+      - docker
+      - docker-engine
+      - docker.io
+      - containerd
+      - runc
+    state: absent
+- name: Install Prerequisites
+  apt:
+    pkg:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+      - python3-pip
+- name: Remove existing GPG Key
+  file:
+    path: /etc/apt/trusted.gpg.d/docker.gpg
+    state: absent
+- name: Install Docker GPG Key
+  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/docker.gpg
+- name: Get Architecture
+  shell: dpkg --print-architecture
+  register: deb_architecture
+- name: Get Release
+  shell: lsb_release -cs
+  register: deb_release
+- name: Add Docker apt repo
+  ansible.builtin.apt_repository:
+    repo: "deb [arch={{ deb_architecture.stdout }} signed-by=/etc/apt/trusted.gpg.d/docker.gpg] https://download.docker.com/linux/ubuntu {{ deb_release.stdout }} stable"
+- name: Install Docker
+  apt:
+    pkg:
+      - docker-ce
+      - docker-compose-plugin
+      - docker-ce-cli
+      - containerd.io
+    update_cache: true
+- name: Install Docker Python SDK
+  pip:
+    name: docker
+
+- name: Install Docker Compose
+  pip:
+    name: docker-compose

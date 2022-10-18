@@ -1,0 +1,8 @@
+#!/usr/bin/env ansible-playbook
+
+- name: Install Docker
+  hosts: "{{ targets }}"
+  become: true
+  roles:
+    - vm-common
+    - docker-host

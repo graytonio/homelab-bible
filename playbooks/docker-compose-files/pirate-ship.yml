@@ -1,0 +1,114 @@
+version: "3.8"
+services:
+  vpn-net:
+    image: qmcgaw/gluetun:v3.31
+    container_name: vpn-net
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - 9117:9117
+      - 9091:9091
+      - 51413:51413
+      - 51413:51413/udp
+      - 7878:7878
+      - 8989:8989
+    environment:
+      - VPNSP=private internet access
+      - REGION=US Florida
+      - OPENVPN_USER=$USER
+      - OPENVPN_PASSWORD=$PASSWORD
+      - TZ=America/New_York
+    volumes:
+      - vpn_config:/gluetun
+    restart: always
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    network_mode: "service:vpn-net"
+    depends_on:
+      - vpn-net
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - jackett_config:/config
+    restart: unless-stopped
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    network_mode: "service:vpn-net"
+    depends_on:
+      - vpn-net
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=America/New_York
+    volumes:
+      - transmission_config:/config
+      - downloads:/downloads
+    restart: unless-stopped
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    network_mode: "service:vpn-net"
+    depends_on:
+      - vpn-net
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=America/New_York
+    volumes:
+      - radarr_config:/config
+      - downloads:/downloads
+      - movies:/movies
+    restart: unless-stopped
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    network_mode: "service:vpn-net"
+    depends_on:
+      - vpn-net
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=America/New_York
+    volumes:
+      - sonarr_config:/config
+      - downloads:/downloads
+      - tv:/tv
+    restart: unless-stopped
+  ombi:
+    image: lscr.io/linuxserver/ombi:latest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ombi_config:/config
+    ports:
+      - "3579:3579"
+    restart: unless-stopped
+
+volumes:
+  movies:
+    driver_opts:
+      type: "nfs"
+      o: "addr=10.0.0.50,nolock,soft,rw,nfsvers=3"
+      device: ":/mnt/Vault/Media/Movies"
+  tv:
+    driver_opts:
+      type: "nfs"
+      o: "addr=10.0.0.50,nolock,soft,rw,nfsvers=3"
+      device: ":/mnt/Vault/Media/TV"
+  downloads:
+    driver_opts:
+      type: "nfs"
+      o: "addr=10.0.0.50,nolock,soft,rw,nfsvers=3"
+      device: ":/mnt/Vault/Media/downloads"
+  vpn_config:
+  jackett_config:
+  transmission_config:
+  sonarr_config:
+  radarr_config:
+  ombi_config:

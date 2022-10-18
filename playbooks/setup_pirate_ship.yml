@@ -1,0 +1,31 @@
+#!/usr/bin/env ansible-playbook
+
+- name: Configure Pirate Ship Docker Stack
+  hosts: "{{ targets }}"
+  become: true
+  roles:
+    - vm-common
+    - docker-host
+  vars:
+    targets: "docker"
+  vars_prompt:
+    - name: pia_username
+      private: false
+      prompt: PIA Username
+    - name: pia_password
+      private: true
+      prompt: PIA Password
+  tasks:
+    - name: Copy Compose File
+      copy:
+        src: docker-compose-files/pirate-ship.yml
+        dest: /home/ansible/pirate-ship.yaml
+    - name: Spin Up Services
+      community.docker.docker_compose:
+        project_src: /home/ansible
+        project_name: pirate-ship
+        files:
+          - pirate-ship.yaml
+      environment:
+        USER: "{{ pia_username }}"
+        PASSWORD: "{{ pia_password }}"

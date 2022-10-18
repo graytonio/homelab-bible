@@ -1,0 +1,21 @@
+#!/usr/bin/env ansible-playbook
+
+- name: Configure Portainer
+  hosts: "{{ targets }}"
+  become: true
+  roles:
+    - vm-common
+    - docker-host
+  vars:
+    targets: "docker"
+  tasks:
+    - name: Copy Compose File
+      copy:
+        src: docker-compose-files/portainer.yml
+        dest: /home/ansible/portainer.yaml
+    - name: Spin Up Services
+      community.docker.docker_compose:
+        project_src: /home/ansible
+        project_name: portainer
+        files:
+          - portainer.yaml
