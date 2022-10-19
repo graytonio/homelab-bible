@@ -1,0 +1,22 @@
+#!/usr/bin/env ansible-playbook
+
+- name: Configure Watchtower
+  hosts: "{{ targets }}"
+  become: true
+  roles:
+    - vm-common
+    - docker-host
+  vars:
+    targets: "docker"
+    discord_webhook: "discord://NeYxFyv5XSbvmPdSYjfLfoYGYztNECiEyOnogFb9wwvz0j1mvjdK6i_jdJJQ3DE2ZL5A@1032427891918647357"
+  tasks:
+    - name: Copy Compose File
+      template:
+        src: templates/watchtower.yml.j2
+        dest: /home/ansible/watchtower.yml
+    - name: Spin Up Services
+      community.docker.docker_compose:
+        project_src: /home/ansible
+        project_name: watchtower
+        files:
+          - watchtower.yml

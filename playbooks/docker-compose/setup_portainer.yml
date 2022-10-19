@@ -1,21 +1,21 @@
 #!/usr/bin/env ansible-playbook
 
-- name: Configure NGINX Proxy Manager
+- name: Configure Portainer
   hosts: "{{ targets }}"
   become: true
   roles:
     - vm-common
     - docker-host
   vars:
-    targets: "nginx"
+    targets: "docker"
   tasks:
     - name: Copy Compose File
-      copy:
-        src: templates/docker-compose-files/nginx-proxymanager.yml.j2
-        dest: /home/ansible/nginx-proxymanager.yml
+      template:
+        src: templates/portainer.yml.j2
+        dest: /home/ansible/portainer.yml
     - name: Spin Up Services
       community.docker.docker_compose:
         project_src: /home/ansible
-        project_name: nginx-proxymanager
+        project_name: portainer
         files:
-          - nginx-proxymanager.yml
+          - portainer.yml

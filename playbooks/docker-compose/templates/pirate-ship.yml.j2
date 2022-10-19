@@ -14,44 +14,44 @@ services:
       - 8989:8989
     environment:
       - VPNSP=private internet access
-      - REGION=$VPN_REGION
+      - REGION={{ vpn_region }}
       - OPENVPN_USER=$USER
       - OPENVPN_PASSWORD=$PASSWORD
-      - TZ=$TZ
+      - TZ={{ tz }}
     volumes:
       - vpn_config:/gluetun
     restart: always
   jackett:
     image: lscr.io/linuxserver/jackett:latest
-    container_name: jackett
     network_mode: "service:vpn-net"
     depends_on:
-      - vpn-net
+      vpn-net:
+        condition: service_healthy
     environment:
-      - TZ=$TZ
+      - TZ={{ tz }}
     volumes:
       - jackett_config:/config
     restart: unless-stopped
   transmission:
     image: lscr.io/linuxserver/transmission:latest
-    container_name: transmission
     network_mode: "service:vpn-net"
     depends_on:
-      - vpn-net
+      vpn-net:
+        condition: service_healthy
     environment:
-      - TZ=$TZ
+      - TZ={{ tz }}
     volumes:
       - transmission_config:/config
       - downloads:/downloads
     restart: unless-stopped
   radarr:
     image: lscr.io/linuxserver/radarr:latest
-    container_name: radarr
     network_mode: "service:vpn-net"
     depends_on:
-      - vpn-net
+      vpn-net:
+        condition: service_healthy
     environment:
-      - TZ=$TZ
+      - TZ={{ tz }}
     volumes:
       - radarr_config:/config
       - downloads:/downloads
@@ -59,12 +59,12 @@ services:
     restart: unless-stopped
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
-    container_name: sonarr
     network_mode: "service:vpn-net"
     depends_on:
-      - vpn-net
+      vpn-net:
+        condition: service_healthy
     environment:
-      - TZ=$TZ
+      - TZ={{ tz }}
     volumes:
       - sonarr_config:/config
       - downloads:/downloads
@@ -73,7 +73,7 @@ services:
   ombi:
     image: lscr.io/linuxserver/ombi:latest
     environment:
-      - TZ=$TZ
+      - TZ={{ tz }}
     volumes:
       - ombi_config:/config
     ports:
@@ -84,18 +84,18 @@ volumes:
   movies:
     driver_opts:
       type: "nfs"
-      o: "addr=$NFS_HOST,nolock,soft,rw,nfsvers=3"
-      device: ":$NFS_MOVIES_PATH"
+      o: "addr={{ nfs_host }},nolock,soft,rw,nfsvers=3"
+      device: ":{{ nfs_movies_path }}"
   tv:
     driver_opts:
       type: "nfs"
-      o: "addr=$NFS_HOST,nolock,soft,rw,nfsvers=3"
-      device: ":$NFS_TV_PATH"
+      o: "addr={{ nfs_host }},nolock,soft,rw,nfsvers=3"
+      device: ":{{ nfs_tv_path }}"
   downloads:
     driver_opts:
       type: "nfs"
-      o: "addr=$NFS_HOST,nolock,soft,rw,nfsvers=3"
-      device: ":$NFS_DOWNLOADS_PATH"
+      o: "addr={{ nfs_host }},nolock,soft,rw,nfsvers=3"
+      device: ":{{ nfs_downloads_path }}"
   vpn_config:
   jackett_config:
   transmission_config:

@@ -8,7 +8,7 @@
     - docker-host
   vars:
     targets: "docker"
-    template_tz: "America/New_York"
+    tz: "America/New_York"
     nfs_host: "10.0.0.50"
     nfs_movies_path: "/mnt/Vault/Media/Movies"
     nfs_tv_path: "/mnt/Vault/Media/TV"
@@ -23,8 +23,8 @@
       prompt: PIA Password
   tasks:
     - name: Copy Compose File
-      copy:
-        src: templates/docker-compose-files/pirate-ship.yml.j2
+      template:
+        src: templates/pirate-ship.yml.j2
         dest: /home/ansible/pirate-ship.yml
     - name: Spin Up Services
       community.docker.docker_compose:
@@ -35,9 +35,3 @@
       environment:
         USER: "{{ pia_username }}"
         PASSWORD: "{{ pia_password }}"
-        TZ: "{{ template_tz }}"
-        NFS_HOST: "{{ nfs_host }}"
-        NFS_MOVIES_PATH: "{{ nfs_movies_path }}"
-        NFS_TV_PATH: "{{ nfs_tv_path }}"
-        NFS_DOWNLOADS_PATH: "{{ nfs_downloads_path }}"
-        VPN_REGION: "{{ vpn_region }}"
