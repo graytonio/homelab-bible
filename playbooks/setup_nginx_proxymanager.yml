@@ -11,7 +11,11 @@
   tasks:
     - name: Copy Compose File
       copy:
-        src: docker-compose-files/nginx-proxymanager.yml
-        dest: /home/ansible/nginx-proxymanager.yaml
+        src: templates/docker-compose-files/nginx-proxymanager.yml.j2
+        dest: /home/ansible/nginx-proxymanager.yml
     - name: Spin Up Services
-      shell: docker compose -f /home/ansible/nginx-proxymanager.yaml up -d
+      community.docker.docker_compose:
+        project_src: /home/ansible
+        project_name: nginx-proxymanager
+        files:
+          - nginx-proxymanager.yml

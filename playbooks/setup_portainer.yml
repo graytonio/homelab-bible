@@ -11,11 +11,11 @@
   tasks:
     - name: Copy Compose File
       copy:
-        src: docker-compose-files/portainer.yml
-        dest: /home/ansible/portainer.yaml
+        src: docker-compose-files/portainer.yml.j2
+        dest: /home/ansible/portainer.yml
     - name: Spin Up Services
       community.docker.docker_compose:
         project_src: /home/ansible
         project_name: portainer
         files:
-          - portainer.yaml
+          - portainer.yml

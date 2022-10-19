@@ -1,0 +1,12 @@
+#!/usr/bin/env ansible-playbook
+
+- name: Update Pihole
+  hosts: "{{ targets }}"
+  become: true
+  vars:
+    targets: "pihole"
+  roles:
+    - vm-common
+  tasks:
+    - name: Update Pihole
+      shell: pihole -up

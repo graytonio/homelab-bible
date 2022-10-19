@@ -1,5 +1,7 @@
 #!/usr/bin/env ansible-playbook
 
+# TODO Change to use terraform
+
 - name: Setup Template
   hosts: proxmox
   vars:

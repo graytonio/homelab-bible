@@ -15,12 +15,13 @@
       - curl
       - software-properties-common
       - python3-pip
-- name: Remove existing GPG Key
-  file:
+- name: Check if GPG key is already installed
+  stat:
     path: /etc/apt/trusted.gpg.d/docker.gpg
-    state: absent
+  register: docker_gpg_stat
 - name: Install Docker GPG Key
   shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/docker.gpg
+  when: not docker_gpg_stat.stat.exists
 - name: Get Architecture
   shell: dpkg --print-architecture
   register: deb_architecture

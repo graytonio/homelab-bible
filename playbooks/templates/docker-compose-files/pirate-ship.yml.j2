@@ -14,10 +14,10 @@ services:
       - 8989:8989
     environment:
       - VPNSP=private internet access
-      - REGION=US Florida
+      - REGION=$VPN_REGION
       - OPENVPN_USER=$USER
       - OPENVPN_PASSWORD=$PASSWORD
-      - TZ=America/New_York
+      - TZ=$TZ
     volumes:
       - vpn_config:/gluetun
     restart: always
@@ -28,9 +28,7 @@ services:
     depends_on:
       - vpn-net
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/New_York
+      - TZ=$TZ
     volumes:
       - jackett_config:/config
     restart: unless-stopped
@@ -41,9 +39,7 @@ services:
     depends_on:
       - vpn-net
     environment:
-      - PUID=1000
-      - PGID=100
-      - TZ=America/New_York
+      - TZ=$TZ
     volumes:
       - transmission_config:/config
       - downloads:/downloads
@@ -55,9 +51,7 @@ services:
     depends_on:
       - vpn-net
     environment:
-      - PUID=1000
-      - PGID=100
-      - TZ=America/New_York
+      - TZ=$TZ
     volumes:
       - radarr_config:/config
       - downloads:/downloads
@@ -70,9 +64,7 @@ services:
     depends_on:
       - vpn-net
     environment:
-      - PUID=1000
-      - PGID=100
-      - TZ=America/New_York
+      - TZ=$TZ
     volumes:
       - sonarr_config:/config
       - downloads:/downloads
@@ -81,9 +73,7 @@ services:
   ombi:
     image: lscr.io/linuxserver/ombi:latest
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/New_York
+      - TZ=$TZ
     volumes:
       - ombi_config:/config
     ports:
@@ -94,18 +84,18 @@ volumes:
   movies:
     driver_opts:
       type: "nfs"
-      o: "addr=10.0.0.50,nolock,soft,rw,nfsvers=3"
-      device: ":/mnt/Vault/Media/Movies"
+      o: "addr=$NFS_HOST,nolock,soft,rw,nfsvers=3"
+      device: ":$NFS_MOVIES_PATH"
   tv:
     driver_opts:
       type: "nfs"
-      o: "addr=10.0.0.50,nolock,soft,rw,nfsvers=3"
-      device: ":/mnt/Vault/Media/TV"
+      o: "addr=$NFS_HOST,nolock,soft,rw,nfsvers=3"
+      device: ":$NFS_TV_PATH"
   downloads:
     driver_opts:
       type: "nfs"
-      o: "addr=10.0.0.50,nolock,soft,rw,nfsvers=3"
-      device: ":/mnt/Vault/Media/downloads"
+      o: "addr=$NFS_HOST,nolock,soft,rw,nfsvers=3"
+      device: ":$NFS_DOWNLOADS_PATH"
   vpn_config:
   jackett_config:
   transmission_config:

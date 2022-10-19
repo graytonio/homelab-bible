@@ -13,3 +13,12 @@
     name: qemu-guest-agent
     state: started
     enabled: yes
+
+- name: Check if restart is required
+  stat:
+    path: /var/run/reboot-required
+  register: reboot-file
+
+- name: Reboot if required
+  reboot:
+  when: reboot-file.stat.exists

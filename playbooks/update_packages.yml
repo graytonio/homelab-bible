@@ -1,0 +1,9 @@
+#!/usr/bin/env ansible-playbook
+
+- name: Update All Packages
+  hosts: "{{ targets }}"
+  become: true
+  roles:
+    - vm-common
+  vars:
+    targets: "vms"
