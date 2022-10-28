@@ -1,0 +1,22 @@
+#!/usr/bin/env ansible-playbook
+
+- name: Configure Heimdall
+  hosts: "{{ targets }}"
+  become: true
+  roles:
+    - vm-common
+    - docker-host
+  vars:
+    targets: "docker"
+    tz: "America/New_York"
+  tasks:
+    - name: Copy Compose File
+      template:
+        src: templates/heimdall.yml.j2
+        dest: /home/ansible/heimdall.yml
+    - name: Spin Up Services
+      community.docker.docker_compose:
+        project_src: /home/ansible
+        project_name: heimdall
+        files:
+          - heimdall.yml

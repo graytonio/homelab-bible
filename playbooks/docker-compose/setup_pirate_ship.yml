@@ -13,7 +13,7 @@
     nfs_movies_path: "/mnt/Vault/Media/Movies"
     nfs_tv_path: "/mnt/Vault/Media/TV"
     nfs_downloads_path: "/mnt/Vault/Media/downloads"
-    vpn_region: "US Florida"
+    vpn_region: "US Atlanta"
   vars_prompt:
     - name: pia_username
       private: false

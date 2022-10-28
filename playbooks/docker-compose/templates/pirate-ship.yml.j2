@@ -28,6 +28,8 @@ services:
       vpn-net:
         condition: service_healthy
     environment:
+      - PUID=1000
+      - PGID=1000
       - TZ={{ tz }}
     volumes:
       - jackett_config:/config
@@ -39,6 +41,8 @@ services:
       vpn-net:
         condition: service_healthy
     environment:
+      - PUID=1000
+      - PGID=1000
       - TZ={{ tz }}
     volumes:
       - transmission_config:/config
@@ -51,6 +55,8 @@ services:
       vpn-net:
         condition: service_healthy
     environment:
+      - PUID=1000
+      - PGID=1000
       - TZ={{ tz }}
     volumes:
       - radarr_config:/config
@@ -64,15 +70,32 @@ services:
       vpn-net:
         condition: service_healthy
     environment:
+      - PUID=1000
+      - PGID=1000
       - TZ={{ tz }}
     volumes:
       - sonarr_config:/config
       - downloads:/downloads
       - tv:/tv
     restart: unless-stopped
+  nzbget:
+    container_name: nzbget
+    image: lscr.io/linuxserver/nzbget:latest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ={{ tz }}
+    volumes:
+      - nzb_config:/config
+      - downloads:/downloads
+    ports:
+      - "6789:6789"
+    restart: unless-stopped
   ombi:
     image: lscr.io/linuxserver/ombi:latest
     environment:
+      - PUID=1000
+      - PGID=1000
       - TZ={{ tz }}
     volumes:
       - ombi_config:/config
@@ -84,17 +107,17 @@ volumes:
   movies:
     driver_opts:
       type: "nfs"
-      o: "addr={{ nfs_host }},nolock,soft,rw,nfsvers=3"
+      o: "addr={{ nfs_host }},nfsvers=4"
       device: ":{{ nfs_movies_path }}"
   tv:
     driver_opts:
       type: "nfs"
-      o: "addr={{ nfs_host }},nolock,soft,rw,nfsvers=3"
+      o: "addr={{ nfs_host }},nfsvers=4"
       device: ":{{ nfs_tv_path }}"
   downloads:
     driver_opts:
       type: "nfs"
-      o: "addr={{ nfs_host }},nolock,soft,rw,nfsvers=3"
+      o: "addr={{ nfs_host }},nfsvers=4"
       device: ":{{ nfs_downloads_path }}"
   vpn_config:
   jackett_config:
@@ -102,3 +125,4 @@ volumes:
   sonarr_config:
   radarr_config:
   ombi_config:
+  nzb_config:
