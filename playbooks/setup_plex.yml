@@ -9,6 +9,7 @@
     # Root NFS path (10.0.0.50:/mnt/Vault/Media) /Movies /TV /Music will be appended to root
     - name: nfs_root
       prompt: NFS Root Path
+      private: false
   vars:
     targets: "plex"
   tasks:
