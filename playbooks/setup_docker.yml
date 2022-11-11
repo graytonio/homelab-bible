@@ -2,6 +2,8 @@
 
 - name: Install Docker
   hosts: "{{ targets }}"
+  vars:
+    targets: docker
   become: true
   roles:
     - vm-common

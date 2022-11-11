@@ -1,0 +1,39 @@
+all:
+  children:
+    proxmox:
+      hosts:
+        kratos:
+        proxmox-lkld:
+        backups-lkld:
+      vars:
+        ansible_user: root
+    vms:
+      hosts:
+        docker-atl:
+        plex-atl:
+        pihole-atl:
+        talos-atl:
+        nginx-atl:
+        pihole-lkld:
+        nginx-lkld:
+    atlanta:
+      hosts:
+        kratos:
+        docker-atl:
+        plex-atl:
+        pihole-atl:
+        talos-atl:
+        nginx-atl:
+      vars:
+        host_domain: infrastructure
+    lakeland:
+      hosts:
+        pihole-lkld:
+        nginx-lkld:
+        proxmox-lkld:
+        backups-lkld:
+      vars:
+        host_domain: lakeland
+  vars:
+    ansible_host: "{{inventory_hostname}}.{{host_domain}}"
+    ansible_user: ansible

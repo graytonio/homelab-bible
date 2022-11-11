@@ -3,20 +3,27 @@
 - name: Push Active Keys To Hosts
   hosts: all
   tasks:
-    - block:
-      - name: Compile Active Keys into Single File
-        run_once: true
-        local_action: shell keys/collect.sh
-      
-      - name: Push Keys Out To Hosts
-        authorized_key:
-          user: "{{ ansible_user }}"
-          state: present
-          exclusive: true
-          key: "{{ lookup('file', 'allkeys.key') }}"
+    - name: Push Keys
+      block:
+        - name: Compile Active Keys into Single File
+          run_once: true
+          ansible.builtin.command: keys/collect.sh
+          delegate_to: localhost
+          changed_when: false
+          tags:
+            - skip_ansible_lint
+
+        - name: Push Keys Out To Hosts
+          ansible.posix.authorized_key:
+            user: "{{ ansible_user }}"
+            state: present
+            exclusive: true
+            key: "{{ lookup('file', 'allkeys.key') }}"
       always:
-      - name: Cleanup AllKeys Files
-        run_once: true
-        file:
-          path: allkeys.key
-          state: absent
+        - name: Cleanup AllKeys Files
+          run_once: true
+          ansible.builtin.file:
+            path: allkeys.key
+            state: absent
+          tags:
+            - skip_ansible_lint

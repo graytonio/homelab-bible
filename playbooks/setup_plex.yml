@@ -13,12 +13,12 @@
     targets: "plex"
   tasks:
     - name: Install Dependencies
-      apt:
+      ansible.builtin.apt:
         name: nfs-common
     - name: Add Mount Points
-      mount:
+      ansible.posix.mount:
         src: "{{ (nfs_root, item) | path_join }}"
-        path: "/mnt/{{item}}"
+        path: "/mnt/{{ item }}"
         state: mounted
         fstype: nfs
       loop:
@@ -28,15 +28,16 @@
 
     - name: Add Plex Official Repo
       block:
-      - name: Fetch Key 
-        get_url:
-          url: https://downloads.plex.tv/plex-keys/PlexSign.key
-          dest: /etc/apt/trusted.gpg.d/plex.asc
-      - name: Add Repository
-        apt_repository:
-          repo: deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/plex.asc] https://downloads.plex.tv/repo/deb public main
+        - name: Fetch Key
+          ansible.builtin.get_url:
+            url: https://downloads.plex.tv/plex-keys/PlexSign.key
+            dest: /etc/apt/trusted.gpg.d/plex.asc
+            mode: u=rw,g=r,o=r
+        - name: Add Repository
+          ansible.builtin.apt_repository:
+            repo: deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/plex.asc] https://downloads.plex.tv/repo/deb public main
 
     - name: Install Plex
-      apt:
+      ansible.builtin.apt:
         update_cache: true
         name: plexmediaserver

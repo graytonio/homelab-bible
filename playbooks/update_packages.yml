@@ -2,8 +2,8 @@
 
 - name: Update All Packages
   hosts: "{{ targets }}"
+  vars:
+    targets: vms
   become: true
   roles:
     - vm-common
-  vars:
-    targets: "vms"

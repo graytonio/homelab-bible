@@ -13,18 +13,22 @@
     targets: "pihole"
   tasks:
     - name: Hash Password
-      shell: "echo -n {{ password }} | sha256sum | awk '{printf \"%s\",$1 }' | sha256sum | awk '{printf \"%s\",$1}'"
+      ansible.builtin.shell: "set -o pipefail && echo -n {{ password }} | sha256sum | awk '{printf \"%s\",$1 }' | sha256sum | awk '{printf \"%s\",$1}'"
       register: hashed_password_shell
+      changed_when: false
     - name: Set Hashed Password
-      set_fact:
+      ansible.builtin.set_fact:
         hashed_password: "{{ hashed_password_shell.stdout }}"
     - name: Make Sure PiHole Dir Exists
-      file:
+      ansible.builtin.file:
         path: /etc/pihole
         state: directory
+        mode: u=rwx,g=rwx,o=rx
     - name: Create setupVars.conf
-      template:
+      ansible.builtin.template:
         src: templates/pihole-setupVars.j2
         dest: /etc/pihole/setupVars.conf
+        mode: u=rw,g=r,o=r
     - name: Run Install Script
-      shell: curl -L https://install.pi-hole.net | bash /dev/stdin --unattended
+      ansible.builtin.shell: set -o pipefail && curl -L https://install.pi-hole.net | bash /dev/stdin --unattended
+      changed_when: false

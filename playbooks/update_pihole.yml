@@ -9,4 +9,5 @@
     - vm-common
   tasks:
     - name: Update Pihole
-      shell: pihole -up
+      ansible.builtin.command: pihole -up
+      changed_when: false

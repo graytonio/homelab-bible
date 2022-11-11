@@ -1,24 +1,24 @@
 - name: Update All Packages
-  apt:
+  ansible.builtin.apt:
     update_cache: true
     upgrade: true
 
 - name: Ensure QEMU Guest Agent is Installed
-  apt:
+  ansible.builtin.apt:
     name: qemu-guest-agent
     state: present
 
 - name: Ensure QEMU Guest Agent is Enabled
-  systemd:
+  ansible.builtin.systemd:
     name: qemu-guest-agent
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Check if restart is required
-  stat:
+  ansible.builtin.stat:
     path: /var/run/reboot-required
   register: reboot_file
 
 - name: Reboot if required
-  reboot:
+  ansible.builtin.reboot:
   when: reboot_file.stat.exists
