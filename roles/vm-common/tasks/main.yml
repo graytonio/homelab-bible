@@ -14,6 +14,12 @@
     state: started
     enabled: true
 
+- name: Disable SSH Delete Keys
+  ansible.builtin.lineinfile:
+    path: /etc/cloud/cloud.cfg
+    regexp: '^ssh_deletekeys: '
+    line: 'ssh_deletekeys: false'
+
 - name: Check if restart is required
   ansible.builtin.stat:
     path: /var/run/reboot-required
