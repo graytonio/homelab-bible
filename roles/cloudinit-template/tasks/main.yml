@@ -12,6 +12,7 @@
   ansible.builtin.debug:
     var: "{{ play_hosts | map('extract', hostvars, 'template_exists') | selectattr('failed', '==', false) | list | count }}"
 
+# TODO Add install qemu-guest-agent
 - name: Create VM Template if it Does not Exist
   run_once: true
   # Only execute if template vm is found on none of the proxmox hosts

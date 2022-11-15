@@ -7,6 +7,7 @@ all:
         backups-lkld:
       vars:
         ansible_user: root
+        ansible_host: "{{inventory_hostname}}.{{host_domain}}"
     vms:
       hosts:
         docker-atl:
@@ -16,6 +17,9 @@ all:
         nginx-atl:
         pihole-lkld:
         nginx-lkld:
+      vars:
+        ansible_host: "{{inventory_hostname}}.{{host_domain}}"
+        ansible_user: ansible
     atlanta:
       hosts:
         kratos:
@@ -41,6 +45,3 @@ all:
     plex:
       hosts:
         plex-atl:
-  vars:
-    ansible_host: "{{inventory_hostname}}.{{host_domain}}"
-    ansible_user: ansible

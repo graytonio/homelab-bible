@@ -22,6 +22,7 @@
       always:
         - name: Cleanup AllKeys Files
           run_once: true
+          delegate_to: localhost
           ansible.builtin.file:
             path: allkeys.key
             state: absent
