@@ -1,0 +1,10 @@
+#!/usr/bin/env ansible-playbook
+
+- name: Reset K3S Cluster
+  hosts: "k3s:&{{zone}}"
+  vars:
+    zone: "atlanta"
+  gather_facts: true
+  become: true
+  roles:
+    - role: k3s/reset

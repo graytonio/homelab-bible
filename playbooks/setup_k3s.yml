@@ -1,0 +1,30 @@
+#!/usr/bin/env ansible-playbook
+
+- name: Setup K3S Cluster
+  become: true
+  hosts: "k3s:&{{zone}}"
+  vars:
+    zone: "atlanta"
+  roles:
+    - k3s/common
+
+- name: Setup K3S Controllers
+  become: true
+  hosts: "k3s-controllers:&{{zone}}"
+  vars:
+    zone: "atlanta"
+  pre_tasks:
+    - name: Fail if more than one controller
+      ansible.builtin.fail:
+        msg: "{{ play_hosts | length }} controllers configured. This playbook only supports 1 controller setups"
+      when: play_hosts | length > 1
+  roles:
+    - k3s/control
+
+- name: Setup K3S Workers
+  become: true
+  hosts: "k3s-workers:&{{zone}}"
+  vars:
+    zone: "atlanta"
+  roles:
+    - k3s/worker

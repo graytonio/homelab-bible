@@ -1,0 +1,25 @@
+#!/usr/bin/env ansible-playbook
+
+- name: Configure minimal ubuntu server on bare metal
+  hosts: "{{ targets }}"
+  become: true
+  vars:
+    targets: "localhost"
+  tasks:
+    - name: Upgrade Packages
+      ansible.builtin.apt:
+        update_cache: true
+        upgrade: true
+    - name: Install tools
+      ansible.builtin.apt:
+        update_cache: true
+        state: present
+        pkg:
+          - vim
+    - name: Ensure passwordless sudo
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        state: present
+        regex: '^%sudo ALL ='
+        line: '%sudo ALL=(ALL) NOPASSWD:ALL'
+        validate: /usr/sbin/visudo -cf %s

@@ -1,4 +1,7 @@
 all:
+  vars:
+    ansible_host: "{{inventory_hostname}}.{{host_domain}}"
+    ansible_user: ansible
   children:
     proxmox:
       hosts:
@@ -7,7 +10,6 @@ all:
         backups-lkld:
       vars:
         ansible_user: root
-        ansible_host: "{{inventory_hostname}}.{{host_domain}}"
     vms:
       hosts:
         docker-atl:
@@ -17,9 +19,7 @@ all:
         nginx-atl:
         pihole-lkld:
         nginx-lkld:
-      vars:
-        ansible_host: "{{inventory_hostname}}.{{host_domain}}"
-        ansible_user: ansible
+        k3s-atl:
     atlanta:
       hosts:
         kratos:
@@ -28,6 +28,8 @@ all:
         pihole-atl:
         talos-atl:
         nginx-atl:
+        k3s-atl:
+        k3s-worker-0:
       vars:
         host_domain: infrastructure
     lakeland:
@@ -41,7 +43,17 @@ all:
     pihole:
       hosts:
         pihole-atl:
+          sync: primary
         pihole-lkld:
+          sync: secondary
     plex:
       hosts:
         plex-atl:
+    k3s:
+      children:
+        k3s-controllers:
+          hosts:
+            k3s-atl:
+        k3s-workers:
+          hosts:
+            k3s-worker-0:
